@@ -1,0 +1,115 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="utf-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <title>Pac-Man — Clássico Arcade</title>
+
+    <!-- Favicons -->
+    <link href="/favicon-32x32.png" rel="icon" sizes="32x32" type="image/png"/>
+    <link href="/favicon.ico" rel="icon" type="image/x-icon"/>
+    <link href="manifest.json" rel="manifest"/>
+    <meta name="theme-color" content="#ffff00"/>
+
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect"/>
+    <link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+    <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"/>
+
+    <!-- CSS -->
+    <link href="style.css?v=2.0.0" rel="stylesheet"/>
+</head>
+<body>
+    <div class="arcade-container">
+        <!-- Cabeçalho do Arcade -->
+        <header class="arcade-header">
+            <div class="brand-section">
+                <img src="/logo.webp" alt="4U.IA.BR Logo" class="brand-logo" onerror="this.style.display='none'">
+                <h1 class="arcade-title">PAC-MAN</h1>
+            </div>
+            
+            <div class="header-actions">
+                <button id="btn-sound" class="btn-arcade btn-secondary" title="Alternar Som (S)">
+                    <span id="sound-label">🔊 SOM</span>
+                </button>
+                <button id="btn-help" class="btn-arcade btn-secondary" title="Instruções de Jogo">
+                    <span>❓</span>
+                </button>
+            </div>
+        </header>
+
+        <!-- Placar Clássico 1UP & HIGH SCORE -->
+        <div class="score-board">
+            <div class="score-box">
+                <span class="score-label">1UP</span>
+                <span class="score-value" id="current-score">00</span>
+            </div>
+            <div class="score-box">
+                <span class="score-label high-score-label">HIGH SCORE</span>
+                <span class="score-value" id="high-score">10000</span>
+            </div>
+        </div>
+
+        <!-- Tela do Jogo (Canvas) -->
+        <div class="arcade-screen" id="arcade-screen">
+            <div id="pacman"></div>
+        </div>
+
+        <!-- Botões de Ação na Tela -->
+        <div class="arcade-controls-bar">
+            <button id="btn-new-game" class="btn-arcade">▶ NOVO JOGO (N)</button>
+            <button id="btn-pause" class="btn-arcade btn-secondary">⏸ PAUSAR (P)</button>
+        </div>
+
+        <!-- D-Pad Virtual (Touch Controls para Celular) -->
+        <div class="dpad-container" id="dpad-container">
+            <div class="dpad-row">
+                <button class="dpad-btn" id="dpad-up" aria-label="Cima">▲</button>
+            </div>
+            <div class="dpad-row">
+                <button class="dpad-btn" id="dpad-left" aria-label="Esquerda">◀</button>
+                <div class="dpad-center">🕹️</div>
+                <button class="dpad-btn" id="dpad-right" aria-label="Direita">▶</button>
+            </div>
+            <div class="dpad-row">
+                <button class="dpad-btn" id="dpad-down" aria-label="Baixo">▼</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de Ajuda -->
+    <div class="modal-overlay" id="modal-overlay"></div>
+    <div class="modal" id="help-modal">
+        <div class="modal-content">
+            <span class="close-btn" id="close-help-btn">&times;</span>
+            <h2>COMO JOGAR PAC-MAN</h2>
+            <div class="modal-body">
+                <p><strong>Objetivo:</strong> Coma todas as pílulas amarelas do labirinto sem ser pego pelos fantasmas!</p>
+                <ul>
+                    <li>🟡 <strong>Pastilhas Normais:</strong> 10 Pontos cada.</li>
+                    <li>🔴 <strong>Super Pílula (Energizer):</strong> 50 Pontos. Faz os fantasmas ficarem azuis e vulneráveis por alguns segundos!</li>
+                    <li>👻 <strong>Comer Fantasma:</strong> 200, 400, 800, 1600 pontos sucessivos!</li>
+                </ul>
+                <p><strong>Controles no Computador:</strong></p>
+                <ul>
+                    <li>Setas Direcionais ou <strong>W, A, S, D</strong> para mover</li>
+                    <li><strong>N:</strong> Novo Jogo | <strong>P:</strong> Pausar | <strong>S:</strong> Ligar/Desligar Som</li>
+                </ul>
+                <p><strong>Controles no Celular:</strong></p>
+                <ul>
+                    <li>Use os <strong>botões do controle virtual (D-Pad)</strong> ou deslize o dedo na tela (<strong>Swipe</strong>) para mudar de direção.</li>
+                </ul>
+            </div>
+            <button class="btn-arcade" id="btn-modal-ok" style="align-self: center; margin-top: 10px;">VAMOS JOGAR!</button>
+        </div>
+    </div>
+
+    <!-- Rodapé -->
+    <footer class="footer-clean">
+        <span>© 2026 4U.IA.BR</span>
+    </footer>
+
+    <!-- Script Principal -->
+    <script src="script.js?v=2.0.0"></script>
+</body>
+</html>

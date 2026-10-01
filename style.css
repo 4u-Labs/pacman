@@ -1,0 +1,393 @@
+@import url('https://fonts.googleapis.com/css2?family=Orbitron:wght@500;700;900&family=Press+Start+2P&family=Roboto:wght@400;500;700&display=swap');
+
+:root {
+    --pac-yellow: #ffff00;
+    --pac-blue: #2121ff;
+    --pac-ghost-red: #ff0000;
+    --pac-ghost-pink: #ffb8de;
+    --pac-ghost-cyan: #00ffde;
+    --pac-ghost-orange: #ffb847;
+    --bg-dark: #000000;
+    --card-bg: rgba(12, 14, 28, 0.95);
+    --border-neon: rgba(33, 33, 255, 0.6);
+    --font-retro: 'Press Start 2P', monospace;
+    --font-orbitron: 'Orbitron', sans-serif;
+    --font-body: 'Roboto', sans-serif;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+    user-select: none;
+    -webkit-tap-highlight-color: transparent;
+}
+
+html, body {
+    width: 100%;
+    min-height: 100vh;
+    background-color: var(--bg-dark);
+    font-family: var(--font-body);
+    color: #ffffff;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: flex-start;
+    overflow-x: hidden;
+}
+
+/* =========================================
+   GABINETE ARCADE
+   ========================================= */
+.arcade-container {
+    width: 100%;
+    max-width: 500px;
+    padding: 1.2rem 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 12px;
+}
+
+.arcade-header {
+    width: 100%;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 8px;
+    border-bottom: 2px solid var(--border-neon);
+}
+
+.brand-section {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.brand-logo {
+    height: 36px;
+    width: auto;
+    object-fit: contain;
+    filter: drop-shadow(0 0 6px rgba(255, 255, 0, 0.4));
+}
+
+.arcade-title {
+    font-family: var(--font-retro);
+    font-size: 1.2rem;
+    color: var(--pac-yellow);
+    text-shadow: 0 0 10px rgba(255, 255, 0, 0.7);
+    letter-spacing: 2px;
+}
+
+/* PLACAR 1UP & HIGH SCORE */
+.score-board {
+    width: 100%;
+    display: flex;
+    justify-content: space-around;
+    background: rgba(10, 10, 20, 0.9);
+    border: 1px solid var(--border-neon);
+    border-radius: 8px;
+    padding: 10px 8px;
+    box-shadow: 0 0 15px rgba(33, 33, 255, 0.2);
+}
+
+.score-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 4px;
+}
+
+.score-label {
+    font-family: var(--font-retro);
+    font-size: 0.7rem;
+    color: #ff3333;
+    letter-spacing: 1px;
+}
+
+.score-value {
+    font-family: var(--font-retro);
+    font-size: 0.95rem;
+    color: #ffffff;
+    letter-spacing: 2px;
+}
+
+.high-score-label {
+    color: var(--pac-yellow);
+}
+
+/* TELA DO JOGO (CANVAS) */
+.arcade-screen {
+    position: relative;
+    background: #000;
+    border: 4px solid var(--pac-blue);
+    border-radius: 12px;
+    box-shadow: 0 0 25px rgba(33, 33, 255, 0.4), inset 0 0 20px rgba(0, 0, 0, 0.8);
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    overflow: hidden;
+    touch-action: none;
+}
+
+#pacman {
+    width: 382px;
+    height: 470px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+#pacman canvas {
+    display: block;
+    max-width: 100%;
+    height: auto;
+    border-radius: 6px;
+}
+
+/* BARRA DE AÇÕES RETRÔ */
+.arcade-controls-bar {
+    width: 100%;
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin-top: 4px;
+}
+
+.btn-arcade {
+    font-family: var(--font-retro);
+    font-size: 0.65rem;
+    background: rgba(20, 24, 45, 0.9);
+    color: var(--pac-yellow);
+    border: 2px solid var(--pac-yellow);
+    border-radius: 6px;
+    padding: 8px 14px;
+    cursor: pointer;
+    text-transform: uppercase;
+    transition: all 0.2s ease;
+    box-shadow: 0 2px 8px rgba(255, 255, 0, 0.2);
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+}
+
+.btn-arcade:hover {
+    background: var(--pac-yellow);
+    color: #000;
+    box-shadow: 0 0 15px var(--pac-yellow);
+    transform: translateY(-2px);
+}
+
+.btn-arcade:active {
+    transform: translateY(0);
+}
+
+.btn-secondary {
+    color: var(--pac-ghost-cyan);
+    border-color: var(--pac-ghost-cyan);
+    box-shadow: 0 2px 8px rgba(0, 255, 222, 0.2);
+}
+
+.btn-secondary:hover {
+    background: var(--pac-ghost-cyan);
+    color: #000;
+    box-shadow: 0 0 15px var(--pac-ghost-cyan);
+}
+
+/* =========================================
+   D-PAD VIRTUAL PARA CELULAR
+   ========================================= */
+.dpad-container {
+    display: none; /* Ativado via media query em telas touch/mobile */
+    flex-direction: column;
+    align-items: center;
+    margin-top: 10px;
+    touch-action: none;
+    user-select: none;
+}
+
+.dpad-row {
+    display: flex;
+    justify-content: center;
+    gap: 12px;
+}
+
+.dpad-btn {
+    width: 60px;
+    height: 60px;
+    background: rgba(25, 30, 60, 0.85);
+    border: 2px solid var(--border-neon);
+    border-radius: 12px;
+    color: var(--pac-yellow);
+    font-size: 1.5rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5), inset 0 2px 4px rgba(255, 255, 255, 0.1);
+    transition: all 0.15s ease;
+}
+
+.dpad-btn:active {
+    background: var(--pac-yellow);
+    color: #000;
+    box-shadow: 0 0 15px var(--pac-yellow);
+    transform: scale(0.92);
+}
+
+.dpad-center {
+    width: 60px;
+    height: 60px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    color: rgba(255, 255, 255, 0.2);
+    font-size: 0.8rem;
+}
+
+/* =========================================
+   MODAL DE AJUDA / REGRAS
+   ========================================= */
+.modal-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: rgba(0, 0, 0, 0.8);
+    backdrop-filter: blur(5px);
+    z-index: 999;
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.modal {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%) scale(0.92);
+    background-color: #111424;
+    border: 2px solid var(--pac-yellow);
+    border-radius: 14px;
+    padding: 1.8rem;
+    z-index: 1000;
+    width: 90%;
+    max-width: 440px;
+    box-shadow: 0 0 30px rgba(255, 255, 0, 0.3);
+    display: none;
+    opacity: 0;
+    transition: all 0.3s ease;
+}
+
+.modal-overlay.active, .modal.active {
+    display: block;
+    opacity: 1;
+}
+
+.modal.active {
+    transform: translate(-50%, -50%) scale(1);
+}
+
+.modal-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.modal-content h2 {
+    font-family: var(--font-retro);
+    color: var(--pac-yellow);
+    font-size: 1rem;
+    text-align: center;
+    line-height: 1.5;
+}
+
+.close-btn {
+    position: absolute;
+    top: 10px;
+    right: 15px;
+    font-size: 1.6rem;
+    color: #fff;
+    cursor: pointer;
+}
+
+.modal-body {
+    font-size: 0.85rem;
+    color: #bdc1d6;
+    line-height: 1.6;
+}
+
+.modal-body ul {
+    padding-left: 1.2rem;
+    margin-top: 0.5rem;
+}
+
+.modal-body li {
+    margin-bottom: 0.4rem;
+}
+
+/* =========================================
+   RODAPÉ
+   ========================================= */
+.footer-clean {
+    width: 100%;
+    padding: 2rem 0 1rem;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    margin-top: auto;
+}
+
+.footer-clean span {
+    font-size: 0.65rem;
+    color: rgba(255, 255, 255, 0.3);
+    letter-spacing: 0.25em;
+    text-transform: uppercase;
+    font-weight: 600;
+}
+
+/* =========================================
+   RESPONSIVIDADE (MOBILE & TOUCH)
+   ========================================= */
+@media (max-width: 768px) {
+    .dpad-container {
+        display: flex; /* Exibe D-pad no celular */
+    }
+}
+
+@media (max-width: 420px) {
+    .arcade-container {
+        padding: 0.8rem 0.5rem;
+    }
+    
+    .arcade-title {
+        font-size: 0.95rem;
+    }
+    
+    #pacman {
+        width: 320px;
+        height: 400px;
+    }
+    
+    .score-label {
+        font-size: 0.6rem;
+    }
+    
+    .score-value {
+        font-size: 0.8rem;
+    }
+    
+    .dpad-btn {
+        width: 52px;
+        height: 52px;
+        font-size: 1.3rem;
+    }
+    
+    .dpad-center {
+        width: 52px;
+        height: 52px;
+    }
+}

@@ -1,0 +1,16 @@
+{
+  "name": "Pac-Man Arcade Retro",
+  "short_name": "Pac-Man",
+  "start_url": "index.html",
+  "display": "standalone",
+  "background_color": "#000000",
+  "theme_color": "#FFFF00",
+  "description": "O lendário clássico do fliperama Pac-Man jogável diretamente no navegador com sons arcade e controles touch.",
+  "icons": [
+    {
+      "src": "/favicon-32x32.png",
+      "sizes": "32x32",
+      "type": "image/png"
+    }
+  ]
+}

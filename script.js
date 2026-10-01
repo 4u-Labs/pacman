@@ -125,35 +125,90 @@ class PacAudio {
         });
     }
 
+    stopIntro() {
+        if (this.introTimeouts) {
+            this.introTimeouts.forEach(t => clearTimeout(t));
+            this.introTimeouts = [];
+        }
+    }
+
     playIntro() {
-        // Melodia clássica do Pac-Man (arpeggios)
+        if (!this.ctx) this.init();
+        if (!this.ctx || this.isMuted) return;
+
+        this.stopIntro();
+
+        // Melodia clássica completa do Pac-Man (Namco 1980 - 31 notas completas)
+        const tempo = 108;
+        const wholenote = (60 / tempo) * 4;
+
         const melody = [
-            { f: 493.88, d: 0.12 }, { f: 987.77, d: 0.12 }, { f: 739.99, d: 0.12 }, { f: 622.25, d: 0.12 },
-            { f: 987.77, d: 0.08 }, { f: 739.99, d: 0.16 }, { f: 622.25, d: 0.2 },
-            { f: 523.25, d: 0.12 }, { f: 1046.50, d: 0.12 }, { f: 783.99, d: 0.12 }, { f: 659.25, d: 0.12 },
-            { f: 1046.50, d: 0.08 }, { f: 783.99, d: 0.16 }, { f: 659.25, d: 0.2 },
-            { f: 493.88, d: 0.12 }, { f: 987.77, d: 0.12 }, { f: 739.99, d: 0.12 }, { f: 622.25, d: 0.12 },
-            { f: 987.77, d: 0.08 }, { f: 739.99, d: 0.16 }, { f: 622.25, d: 0.2 }
+            // Frase 1
+            { f: 493.88, d: wholenote / 16 }, // B4
+            { f: 987.77, d: wholenote / 16 }, // B5
+            { f: 739.99, d: wholenote / 16 }, // F#5
+            { f: 622.25, d: wholenote / 16 }, // D#5
+            { f: 987.77, d: wholenote / 32 }, // B5
+            { f: 739.99, d: (wholenote / 16) * 1.5 }, // F#5
+            { f: 622.25, d: wholenote / 8 },  // D#5
+
+            // Frase 2
+            { f: 523.25, d: wholenote / 16 }, // C5
+            { f: 1046.50, d: wholenote / 16 }, // C6
+            { f: 783.99, d: wholenote / 16 }, // G5
+            { f: 659.25, d: wholenote / 16 }, // E5
+            { f: 1046.50, d: wholenote / 32 }, // C6
+            { f: 783.99, d: (wholenote / 16) * 1.5 }, // G5
+            { f: 659.25, d: wholenote / 8 },  // E5
+
+            // Frase 3 (repetição)
+            { f: 493.88, d: wholenote / 16 }, // B4
+            { f: 987.77, d: wholenote / 16 }, // B5
+            { f: 739.99, d: wholenote / 16 }, // F#5
+            { f: 622.25, d: wholenote / 16 }, // D#5
+            { f: 987.77, d: wholenote / 32 }, // B5
+            { f: 739.99, d: (wholenote / 16) * 1.5 }, // F#5
+            { f: 622.25, d: wholenote / 8 },  // D#5
+
+            // Frase 4: Subida cromática e finalização icônica!
+            { f: 622.25, d: wholenote / 32 }, // D#5
+            { f: 659.25, d: wholenote / 32 }, // E5
+            { f: 698.46, d: wholenote / 32 }, // F5
+            { f: 698.46, d: wholenote / 32 }, // F5
+            { f: 739.99, d: wholenote / 32 }, // F#5
+            { f: 783.99, d: wholenote / 32 }, // G5
+            { f: 783.99, d: wholenote / 32 }, // G5
+            { f: 830.61, d: wholenote / 32 }, // G#5
+            { f: 880.00, d: wholenote / 16 }, // A5
+            { f: 987.77, d: wholenote / 8 }   // B5
         ];
 
         let offset = 0;
+        this.introTimeouts = [];
         melody.forEach(note => {
-            setTimeout(() => {
-                if (!this.isMuted) this.playTone(note.f, 'square', note.d, 0.22);
+            const t = setTimeout(() => {
+                if (!this.isMuted) this.playTone(note.f, 'square', note.d * 0.88, 0.22);
             }, offset * 1000);
-            offset += note.d + 0.03;
+            this.introTimeouts.push(t);
+            offset += note.d;
         });
     }
 
     toggleMute() {
         this.isMuted = !this.isMuted;
+        if (this.isMuted) this.stopIntro();
         localStorage.setItem('pacman_sound_disabled', this.isMuted);
         return this.isMuted;
     }
 
-    pause() {}
+    pause() {
+        this.stopIntro();
+    }
     resume() {}
-    disableSound() { this.isMuted = true; }
+    disableSound() {
+        this.isMuted = true;
+        this.stopIntro();
+    }
 }
 
 // ==========================================
@@ -660,6 +715,29 @@ Pacman.Ghost = function (game, map, colour) {
     function move() {
         if (!position) reset();
         const oldPos = position;
+        const tick = game.getTick();
+
+        // Velocidade autêntica do Arcade (Nível 1):
+        // - Frightened (azul/vulnerável): 50% da velocidade (speed = 1)
+        // - Eaten (olhos voltando à base): 200% da velocidade (speed = 4)
+        // - Normal: no arcade nível 1, fantasmas movem a 75% da velocidade do Pac-Man (Blinky a 80%)
+        //   Isso permite que o Pac-Man escape em linha reta e não seja encurralado injustamente.
+        // - Túnel lateral: fantasmas sofrem lentidão adicional para 50% de velocidade.
+        if (!isVulnerable() && !isHidden()) {
+            const inTunnel = (position.y === 100 && (position.x <= 30 || position.x >= 150));
+            if (inTunnel) {
+                if (tick % 2 === 0) return { new: position, old: oldPos };
+            } else {
+                const isBlinky = (colour === "#ff0000");
+                if (isBlinky) {
+                    if (tick % 5 === 0) return { new: position, old: oldPos }; // Blinky: 80%
+                } else {
+                    const staggerOffset = colour === "#ffb8de" ? 0 : colour === "#00ffde" ? 1 : 2;
+                    if (tick % 4 === staggerOffset) return { new: position, old: oldPos }; // Pinky, Inky, Clyde: 75%
+                }
+            }
+        }
+
         const onGrid = onWholeSquare(position.y) && onWholeSquare(position.x);
 
         if (onGrid) {
@@ -747,7 +825,7 @@ const PACMAN = (function () {
         ctx.font = "14px 'Press Start 2P', monospace";
         const width = ctx.measureText(text).width;
         const x = ((map.width * map.blockSize) - width) / 2;
-        ctx.fillText(text, x, (map.height * 10) + 8);
+        ctx.fillText(text, x, ((map.height * map.blockSize) / 2) + 8);
     }
 
     function soundDisabled() {
@@ -763,6 +841,7 @@ const PACMAN = (function () {
     }
 
     function startNewGame() {
+        if (audio) audio.stopIntro();
         setState(WAITING);
         level = 1;
         user.reset();
@@ -779,7 +858,10 @@ const PACMAN = (function () {
         } else if (state === PLAYING || state === COUNTDOWN) {
             stored = state;
             setState(PAUSE);
-            audio.pause();
+            if (audio) {
+                audio.pause();
+                audio.stopIntro();
+            }
             map.draw(ctx);
             dialog("PAUSADO");
         }
@@ -811,6 +893,7 @@ const PACMAN = (function () {
     }
 
     function loseLife() {
+        if (audio) audio.stopIntro();
         setState(WAITING);
         user.loseLife();
         if (user.getLives() > 0) {
@@ -931,14 +1014,16 @@ const PACMAN = (function () {
                 user.drawDead(ctx, (diff) / 2.5);
             }
         } else if (state === COUNTDOWN) {
-            diff = 5 + Math.floor((timerStart - tick) / Pacman.FPS);
-            if (diff === 0) {
+            diff = (tick - timerStart) / Pacman.FPS;
+            if (diff >= 4.35) {
                 map.draw(ctx);
                 setState(PLAYING);
-            } else if (diff !== lastTime) {
-                lastTime = diff;
+            } else if (stateChanged) {
+                stateChanged = false;
                 map.draw(ctx);
-                dialog("PRONTO! " + diff);
+                user.draw(ctx);
+                for (let i = 0; i < ghosts.length; i++) ghosts[i].draw(ctx);
+                dialog("PRONTO!");
             }
         }
 

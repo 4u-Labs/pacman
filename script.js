@@ -467,6 +467,7 @@ Pacman.User = function (game, map) {
             eaten += 1;
             if (eaten === 182) game.completedLevel();
             if (block === Pacman.PILL) game.eatenPill();
+            else if (game.eatenBiscuit) game.eatenBiscuit();
         }
 
         return { new: position, old: oldPosition };
@@ -552,25 +553,28 @@ Pacman.Ghost = function (game, map, colour) {
     function isDangerous() { return eaten === null; }
     function isHidden() { return eatable === null && eaten !== null; }
 
-    function getRandomDirection() {
-        const moves = (direction === LEFT || direction === RIGHT) ? [UP, DOWN] : [LEFT, RIGHT];
-        return moves[Math.floor(Math.random() * 2)];
-    }
-
     function reset() {
         eaten = null;
         eatable = null;
         position = { x: 90, y: 80 };
-        direction = getRandomDirection();
-        due = getRandomDirection();
+        direction = Math.random() < 0.5 ? LEFT : RIGHT;
+        due = direction;
     }
 
     function onWholeSquare(x) { return x % 10 === 0; }
+    
     function oppositeDirection(dir) {
         if (dir === LEFT) return RIGHT;
         if (dir === RIGHT) return LEFT;
         if (dir === UP) return DOWN;
         return UP;
+    }
+
+    function canMoveInDir(dir, pos) {
+        const tx = Math.round(pos.x / 10) + (dir === LEFT ? -1 : dir === RIGHT ? 1 : 0);
+        const ty = Math.round(pos.y / 10) + (dir === UP ? -1 : dir === DOWN ? 1 : 0);
+        if (ty === 10 && (tx < 0 || tx >= map.width)) return true; // Túnel lateral
+        return map.isFloorSpace({ x: tx, y: ty });
     }
 
     function makeEatable() {
@@ -599,6 +603,7 @@ Pacman.Ghost = function (game, map, colour) {
     }
 
     function draw(ctx) {
+        if (!position) return;
         const s = map.blockSize;
         const top = (position.y / 10) * s;
         const left = (position.x / 10) * s;
@@ -653,45 +658,48 @@ Pacman.Ghost = function (game, map, colour) {
     }
 
     function move() {
+        if (!position) reset();
         const oldPos = position;
         const onGrid = onWholeSquare(position.y) && onWholeSquare(position.x);
-        let npos = null;
 
-        if (due !== direction) {
-            npos = getNewCoord(due, position);
-            const nX = (due === RIGHT || due === DOWN) ? position.x + (10 - (position.x % 10)) : position.x - (position.x % 10);
-            const nY = (due === RIGHT || due === DOWN) ? position.y + (10 - (position.y % 10)) : position.y - (position.y % 10);
-            if (onGrid && map.isFloorSpace({ y: Math.round(nY / 10), x: Math.round(nX / 10) })) {
-                direction = due;
-            } else {
-                npos = null;
+        if (onGrid) {
+            const opp = oppositeDirection(direction);
+            const allDirs = [UP, DOWN, LEFT, RIGHT];
+            const validDirs = allDirs.filter(d => canMoveInDir(d, position));
+            const nonReverseDirs = validDirs.filter(d => d !== opp);
+            const choices = nonReverseDirs.length > 0 ? nonReverseDirs : validDirs;
+
+            if (choices.length > 0) {
+                // Se a direção atual colide com parede, vira obrigatoriamente
+                if (!validDirs.includes(direction)) {
+                    direction = choices[Math.floor(Math.random() * choices.length)];
+                } else if (choices.length > 1 && Math.random() < 0.35) {
+                    // Em bifurcações, chance aleatória de mudar de rota
+                    direction = choices[Math.floor(Math.random() * choices.length)];
+                }
             }
         }
 
-        if (npos === null) npos = getNewCoord(direction, position);
+        const npos = getNewCoord(direction, position);
 
-        if (onGrid && map.isWallSpace({ y: Math.round(npos.y / 10), x: Math.round(npos.x / 10) })) {
-            due = getRandomDirection();
-            return move();
-        }
-
-        if (npos.y === 100 && npos.x >= 190 && direction === RIGHT) position = { y: 100, x: -10 };
-        else if (npos.y === 100 && npos.x <= -10 && direction === LEFT) position = { y: 100, x: 190 };
-        else position = npos;
-
-        const nextY = Math.round(((direction === RIGHT || direction === DOWN) ? position.y + (10 - (position.y % 10)) : position.y - (position.y % 10)) / 10);
-        const nextX = Math.round(((direction === RIGHT || direction === DOWN) ? position.x + (10 - (position.x % 10)) : position.x - (position.x % 10)) / 10);
-
-        if (onGrid && map.isWallSpace({ y: nextY, x: nextX })) {
-            due = getRandomDirection();
+        // Warp tunnel (teletransporte lateral)
+        if (npos.y === 100 && npos.x >= 190 && direction === RIGHT) {
+            position = { y: 100, x: -10 };
+        } else if (npos.y === 100 && npos.x <= -10 && direction === LEFT) {
+            position = { y: 100, x: 190 };
+        } else {
+            position = npos;
         }
 
         return { new: position, old: oldPos };
     }
 
+    reset();
+
     return {
         eat,
         isVunerable: isVulnerable,
+        isVulnerable,
         isDangerous,
         makeEatable,
         reset,
@@ -960,7 +968,8 @@ const PACMAN = (function () {
         map = new Pacman.Map(blockSize);
         user = new Pacman.User({
             completedLevel,
-            eatenPill
+            eatenPill,
+            eatenBiscuit: () => audio.play("eating")
         }, map);
 
         for (let i = 0; i < ghostSpecs.length; i++) {

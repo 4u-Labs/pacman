@@ -131,7 +131,7 @@ html, body {
 }
 
 #pacman {
-    width: 382px;
+    width: 380px;
     height: 470px;
     display: flex;
     align-items: center;
@@ -141,8 +141,18 @@ html, body {
 #pacman canvas {
     display: block;
     max-width: 100%;
+    max-height: 100%;
+    width: auto;
     height: auto;
+    aspect-ratio: 38 / 47;
+    object-fit: contain;
     border-radius: 6px;
+    image-rendering: pixelated;
+    image-rendering: crisp-edges;
+}
+
+.desktop-only {
+    display: inline;
 }
 
 /* BARRA DE AÇÕES RETRÔ */
@@ -271,10 +281,12 @@ html, body {
     background-color: #111424;
     border: 2px solid var(--pac-yellow);
     border-radius: 14px;
-    padding: 1.8rem;
+    padding: 1.5rem;
     z-index: 1000;
     width: 90%;
     max-width: 440px;
+    max-height: 85dvh;
+    overflow-y: auto;
     box-shadow: 0 0 30px rgba(255, 255, 0, 0.3);
     display: none;
     opacity: 0;
@@ -350,44 +362,225 @@ html, body {
 }
 
 /* =========================================
-   RESPONSIVIDADE (MOBILE & TOUCH)
+   RESPONSIVIDADE (MOBILE & TOUCH — 100dvh NO SCROLL)
    ========================================= */
 @media (max-width: 768px) {
+    html, body {
+        height: 100%;
+        height: 100dvh;
+        overflow: hidden;
+        position: fixed;
+        width: 100%;
+        touch-action: none;
+    }
+
+    .desktop-only {
+        display: none !important;
+    }
+
+    .footer-clean {
+        display: none !important;
+    }
+
+    .arcade-container {
+        width: 100%;
+        height: 100%;
+        height: 100dvh;
+        max-height: 100dvh;
+        padding: 6px 8px calc(env(safe-area-inset-bottom, 6px) + 2px) 8px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        align-items: center;
+        gap: 4px;
+        box-sizing: border-box;
+        overflow: hidden;
+    }
+
+    /* Cabeçalho Compacto */
+    .arcade-header {
+        padding-bottom: 4px;
+        gap: 6px;
+        flex-shrink: 0;
+    }
+
+    .brand-logo {
+        height: 24px;
+    }
+
+    .arcade-title {
+        font-size: 0.95rem;
+        letter-spacing: 1px;
+    }
+
+    .header-actions {
+        display: flex;
+        gap: 4px;
+    }
+
+    .header-actions .btn-arcade {
+        padding: 4px 8px;
+        font-size: 0.55rem;
+    }
+
+    /* Placar Compacto */
+    .score-board {
+        padding: 3px 8px;
+        flex-shrink: 0;
+        box-shadow: 0 0 10px rgba(33, 33, 255, 0.2);
+    }
+
+    .score-box {
+        gap: 2px;
+    }
+
+    .score-label {
+        font-size: 0.55rem;
+    }
+
+    .score-value {
+        font-size: 0.8rem;
+        letter-spacing: 1px;
+    }
+
+    /* Tela de Jogo Flexível e Responsiva (Canvas Auto-Fit) */
+    .arcade-screen {
+        flex: 1 1 0;
+        min-height: 0;
+        min-width: 0;
+        width: 100%;
+        border-width: 3px;
+        border-radius: 8px;
+        box-shadow: 0 0 15px rgba(33, 33, 255, 0.3), inset 0 0 12px rgba(0, 0, 0, 0.8);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        overflow: hidden;
+    }
+
+    #pacman {
+        width: 100%;
+        height: 100%;
+        max-width: 100%;
+        max-height: 100%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
+    #pacman canvas {
+        max-width: 100%;
+        max-height: 100%;
+        width: auto;
+        height: auto;
+        aspect-ratio: 38 / 47;
+        object-fit: contain;
+        image-rendering: pixelated;
+        image-rendering: crisp-edges;
+        border-radius: 4px;
+    }
+
+    /* Barra de Ações em Linha Única */
+    .arcade-controls-bar {
+        margin-top: 0;
+        gap: 6px;
+        flex-wrap: nowrap;
+        flex-shrink: 0;
+        width: 100%;
+        justify-content: center;
+    }
+
+    .arcade-controls-bar .btn-arcade {
+        padding: 5px 12px;
+        font-size: 0.6rem;
+        flex: 0 1 auto;
+    }
+
+    /* D-Pad Virtual Otimizado e Ergonômico */
     .dpad-container {
-        display: flex; /* Exibe D-pad no celular */
+        display: flex;
+        margin-top: 2px;
+        margin-bottom: 2px;
+        gap: 4px;
+        flex-shrink: 0;
+        touch-action: none;
+    }
+
+    .dpad-row {
+        gap: 6px;
+    }
+
+    .dpad-btn {
+        width: 46px;
+        height: 46px;
+        font-size: 1.25rem;
+        border-radius: 10px;
+        touch-action: manipulation;
+        -webkit-touch-callout: none;
+    }
+
+    .dpad-center {
+        width: 46px;
+        height: 46px;
+        font-size: 0.9rem;
     }
 }
 
-@media (max-width: 420px) {
+/* Telas Ultra-Compactas ou Baixa Altura (ex: iPhone SE, tela paisagem ou teclado virtual aberto) */
+@media (max-width: 768px) and (max-height: 640px) {
     .arcade-container {
-        padding: 0.8rem 0.5rem;
+        padding: 4px 6px;
+        gap: 2px;
     }
-    
+
+    .arcade-header {
+        padding-bottom: 2px;
+    }
+
+    .brand-logo {
+        height: 20px;
+    }
+
     .arcade-title {
-        font-size: 0.95rem;
+        font-size: 0.85rem;
     }
-    
-    #pacman {
-        width: 320px;
-        height: 400px;
+
+    .score-board {
+        padding: 2px 6px;
     }
-    
+
     .score-label {
-        font-size: 0.6rem;
+        font-size: 0.5rem;
     }
-    
+
     .score-value {
-        font-size: 0.8rem;
+        font-size: 0.75rem;
     }
-    
+
+    .arcade-controls-bar .btn-arcade {
+        padding: 4px 8px;
+        font-size: 0.55rem;
+    }
+
+    .dpad-container {
+        gap: 2px;
+        margin: 1px 0;
+    }
+
+    .dpad-row {
+        gap: 4px;
+    }
+
     .dpad-btn {
-        width: 52px;
-        height: 52px;
-        font-size: 1.3rem;
+        width: 38px;
+        height: 38px;
+        font-size: 1.1rem;
+        border-radius: 8px;
     }
-    
+
     .dpad-center {
-        width: 52px;
-        height: 52px;
+        width: 38px;
+        height: 38px;
+        font-size: 0.8rem;
     }
 }

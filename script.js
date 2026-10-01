@@ -1037,11 +1037,13 @@ const PACMAN = (function () {
     }
 
     function init(wrapper) {
-        const blockSize = wrapper.offsetWidth / 19;
+        const blockSize = 20;
         const canvas = document.createElement("canvas");
 
-        canvas.setAttribute("width", (blockSize * 19) + "px");
-        canvas.setAttribute("height", (blockSize * 22) + 30 + "px");
+        canvas.width = 380;
+        canvas.height = 470;
+        canvas.setAttribute("width", "380");
+        canvas.setAttribute("height", "470");
 
         wrapper.innerHTML = '';
         wrapper.appendChild(canvas);
@@ -1062,7 +1064,8 @@ const PACMAN = (function () {
         }
 
         map.draw(ctx);
-        dialog("APERTE N P/ JOGAR");
+        const isTouch = window.matchMedia && window.matchMedia("(pointer: coarse)").matches;
+        dialog(isTouch ? "TOQUE NOVO P/ JOGAR" : "APERTE N P/ JOGAR");
 
         document.addEventListener("keydown", keyDown, true);
         timer = window.setInterval(mainLoop, 1000 / Pacman.FPS);
@@ -1118,7 +1121,7 @@ document.addEventListener("DOMContentLoaded", () => {
         const btn = document.getElementById(id);
         if (btn) {
             const trigger = (e) => {
-                e.preventDefault();
+                if (e.cancelable) e.preventDefault();
                 PACMAN.setDirection(dir);
             };
             btn.addEventListener("touchstart", trigger, { passive: false });

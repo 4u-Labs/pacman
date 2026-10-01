@@ -2,7 +2,7 @@
 <html lang="pt-BR">
 <head>
     <meta charset="utf-8"/>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"/>
     <title>Pac-Man — Clássico Arcade</title>
 
     <!-- Favicons -->
@@ -17,7 +17,7 @@
     <link href="https://fonts.googleapis.com/css2?family=Press+Start+2P&family=Roboto:wght@400;500;700&display=swap" rel="stylesheet"/>
 
     <!-- CSS -->
-    <link href="style.css?v=2.0.2" rel="stylesheet"/>
+    <link href="style.css?v=2.0.3" rel="stylesheet"/>
 </head>
 <body>
     <div class="arcade-container">
@@ -57,8 +57,8 @@
 
         <!-- Botões de Ação na Tela -->
         <div class="arcade-controls-bar">
-            <button id="btn-new-game" class="btn-arcade">▶ NOVO JOGO (N)</button>
-            <button id="btn-pause" class="btn-arcade btn-secondary">⏸ PAUSAR (P)</button>
+            <button id="btn-new-game" class="btn-arcade">▶ NOVO<span class="desktop-only"> JOGO (N)</span></button>
+            <button id="btn-pause" class="btn-arcade btn-secondary">⏸ PAUSAR<span class="desktop-only"> (P)</span></button>
         </div>
 
         <!-- D-Pad Virtual (Touch Controls para Celular) -->
@@ -110,6 +110,6 @@
     </footer>
 
     <!-- Script Principal -->
-    <script src="script.js?v=2.0.2"></script>
+    <script src="script.js?v=2.0.3"></script>
 </body>
 </html>
